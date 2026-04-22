@@ -6,8 +6,6 @@ namespace MinhaApi.Domain.Models;
 [Table("employee")]
 public class Employee
 {
-    [Key]
-
     public int id { get; private set; }
 
     public string name { get; private set; }

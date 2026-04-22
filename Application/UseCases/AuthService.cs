@@ -20,8 +20,9 @@ public class AuthService
         var employee = employees.FirstOrDefault(x => x.email == email);
 
         if (employee == null || !BCrypt.Net.BCrypt.Verify(password, employee.password))
-            return null;
-
+        {
+            throw new UnauthorizedAccessException("E-mail ou senha inválidos.");
+        }
         return _tokenService.GenerateToken(employee);
     }
 }

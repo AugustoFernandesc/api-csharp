@@ -16,6 +16,7 @@ public class EmployeeValidator : AbstractValidator<EmployeeViewModel>
         .WithMessage("Email invalido! Cade o @ e o dominio?");
 
         RuleFor(x => x.Password)
+        .NotEmpty()
         .MinimumLength(8)
         .WithMessage("Senha deve ter no minimo 8 caracteres");
 

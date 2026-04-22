@@ -93,9 +93,13 @@ app.MapControllers();
 if (app.Environment.IsDevelopment())
 {
     //É o ambiente de dev? Se sim, liga a documentação.
+    app.UseExceptionHandler("/error-development");
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+else
+{
+    app.UseExceptionHandler("/error");
+}
 
 app.Run();

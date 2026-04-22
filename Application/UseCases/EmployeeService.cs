@@ -36,7 +36,6 @@ public class EmployeeService : IEmployeeService
         await _uow.Repository<Employee>().Add(employee);
 
         await _uow.Commit();
-        Console.WriteLine("DADO ENVIADO AO COMMIT!");
     }
     public async Task<byte[]?> GetEmployeePhoto(int id)
     {
@@ -62,7 +61,10 @@ public class EmployeeService : IEmployeeService
     public async Task Update(int id, EmployeeViewModel dto)
     {
         var employee = await _uow.Repository<Employee>().GetById(id);
-        if (employee == null) return;
+        if (employee == null)
+        {
+            throw new Exception("Funcionario nao encontrado");
+        }
 
         string? passwordHash = !string.IsNullOrEmpty(dto.Password)
         ? BCrypt.Net.BCrypt.HashPassword(dto.Password)
@@ -79,7 +81,11 @@ public class EmployeeService : IEmployeeService
     {
         var employee = await _uow.Repository<Employee>().GetById(id);
 
-        if (employee == null) return;
+        if (employee == null)
+        {
+            throw new Exception("Funcionario nao encontrado");
+        }
+
 
         await _uow.Repository<Employee>().Delete(id);
         await _uow.Commit();
