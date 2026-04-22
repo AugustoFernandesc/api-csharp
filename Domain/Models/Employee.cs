@@ -20,7 +20,7 @@ public class Employee
 
     public string? photo { get; private set; }
 
-    public Employee(string name, string email, string password, int age, string photo)
+    public Employee(string name, string email, string password, int age, string? photo)
     {
 
         this.name = name ?? throw new ArgumentNullException(nameof(name));
@@ -29,5 +29,17 @@ public class Employee
         this.age = age;
         this.photo = photo;
 
+    }
+
+    public void UpdateData(string name, string email, int age, string? password = null)
+    {
+        this.name = name;
+        this.email = email;
+        this.age = age;
+
+        if (!string.IsNullOrEmpty(password))
+        {
+            this.password = password;
+        }
     }
 }

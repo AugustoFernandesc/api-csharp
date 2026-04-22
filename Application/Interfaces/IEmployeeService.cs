@@ -1,5 +1,4 @@
 using MinhaApi.Application.ViewModel;
-using MinhaApi.Domain.Models;
 
 namespace MinhaApi.Service;
 
@@ -15,9 +14,13 @@ public interface IEmployeeService
 
     //Saída: Uma lista de objetos Employee.
     //Lógica: O Service vai no Repository, pega o que está no Postgres e entrega para o Controller.
-    Task<List<Employee>> Get();
+    Task<List<EmployeeDTO>> Get();
 
     //Entrada: Um int id.
     // Saída: byte[]? (um array de bytes que pode ser nulo).
     Task<byte[]?> GetEmployeePhoto(int id);
+
+    Task Update(int id, EmployeeViewModel dto);
+
+    Task Delete(int id);
 }

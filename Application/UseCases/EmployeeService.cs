@@ -46,8 +46,42 @@ public class EmployeeService : IEmployeeService
 
         return System.IO.File.ReadAllBytes(employee.photo);
     }
-    public async Task<List<Employee>> Get()
+    public async Task<List<EmployeeDTO>> Get()
     {
-        return await _uow.Repository<Employee>().Get();
+        var employees = await _uow.Repository<Employee>().Get();
+
+        return employees.Select(e => new EmployeeDTO
+        {
+            Id = e.id,
+            Name = e.name,
+            Email = e.email,
+            Age = e.age
+        }).ToList();
+    }
+
+    public async Task Update(int id, EmployeeViewModel dto)
+    {
+        var employee = await _uow.Repository<Employee>().GetById(id);
+        if (employee == null) return;
+
+        string? passwordHash = !string.IsNullOrEmpty(dto.Password)
+        ? BCrypt.Net.BCrypt.HashPassword(dto.Password)
+        : null;
+
+        employee.UpdateData(dto.Name, dto.Email, dto.Age, passwordHash);
+
+        _uow.Repository<Employee>().Update(employee);
+        await _uow.Commit();
+
+    }
+
+    public async Task Delete(int id)
+    {
+        var employee = await _uow.Repository<Employee>().GetById(id);
+
+        if (employee == null) return;
+
+        await _uow.Repository<Employee>().Delete(id);
+        await _uow.Commit();
     }
 }

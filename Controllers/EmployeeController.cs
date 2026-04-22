@@ -54,5 +54,20 @@ public class EmployeeController : ControllerBase
         return Ok(employess);
     }
 
+    [Authorize]
+    [HttpPut]
+    [Route("{id}")]
+    public async Task<IActionResult> Update(int id, [FromForm] EmployeeViewModel employeeView)
+    {
+        return Ok("Atualizado com sucesso");
+    }
+
+    [Authorize]
+    [HttpDelete]
+    [Route("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        return NoContent();
+    }
 
 }
