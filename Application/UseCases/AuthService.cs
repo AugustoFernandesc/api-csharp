@@ -14,12 +14,12 @@ public class AuthService
         _tokenService = tokenService;
     }
 
-    public async Task<string?> Execute(string username, int age)
+    public async Task<string?> Execute(string email, string password)
     {
         var employees = await _uow.Repository<Employee>().Get();
-        var employee = employees.FirstOrDefault(x => x.name == username && x.age == age);
+        var employee = employees.FirstOrDefault(x => x.email == email);
 
-        if (employee == null)
+        if (employee == null || !BCrypt.Net.BCrypt.Verify(password, employee.password))
             return null;
 
         return _tokenService.GenerateToken(employee);

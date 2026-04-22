@@ -14,22 +14,33 @@ public class EmployeeService : IEmployeeService
     }
     public async Task Add(EmployeeViewModel dto)
     {
-        var filePath = Path.Combine("Storage", dto.Photo.FileName);
-        using (Stream fileStream = new FileStream(filePath, FileMode.Create))
+
+        string? filePath = null;
+        if (dto.Photo != null)
         {
-            await dto.Photo.CopyToAsync(fileStream);
+            if (!Directory.Exists("Storage"))
+            {
+                Directory.CreateDirectory("Storage");
+            }
+
+            filePath = Path.Combine("Storage", dto.Photo.FileName);
+            using (Stream fileStream = new FileStream(filePath, FileMode.Create))
+                await dto.Photo.CopyToAsync(fileStream);
         }
 
 
-        var employee = new Employee(dto.Name, dto.Age, filePath);
+        string passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
+
+        var employee = new Employee(dto.Name, dto.Email, passwordHash, dto.Age, filePath);
 
         await _uow.Repository<Employee>().Add(employee);
 
         await _uow.Commit();
+        Console.WriteLine("DADO ENVIADO AO COMMIT!");
     }
     public async Task<byte[]?> GetEmployeePhoto(int id)
     {
-        var employee = await _uow.Repository<Employee>().Get(id);
+        var employee = await _uow.Repository<Employee>().GetById(id);
         if (employee == null || string.IsNullOrEmpty(employee.photo))
             return null;
 

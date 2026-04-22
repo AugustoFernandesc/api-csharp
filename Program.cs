@@ -8,6 +8,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MinhaApi.Infrastructure.Services;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +27,7 @@ builder.Services.AddSwaggerGen();
 //aqui  faz basicamente o seguinte: quando alguem pedir uma interface IEmployeeRepository, entrega a classe EmployeeRepository
 //no nest seria os providers, ele faz com que nao precisa colocar NEW para instanciar a classe
 
-builder.Services.AddTransient<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -35,6 +36,8 @@ builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepositor
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddScoped<AuthService>();
+
+builder.Services.AddValidatorsFromAssemblyContaining<EmployeeValidator>();
 
 //permite que o front converse com essa api, sem isso o navegador bloqueia
 builder.Services.AddCors(options =>
@@ -73,8 +76,18 @@ builder.Services.AddAuthentication(x =>
 var app = builder.Build();
 //tudo que esta abaixo deste var app define como a requisicao viaja dentro da API
 
+//O cara tentou entrar por HTTP? Joga ele para o HTTPS (seguro).
+app.UseHttpsRedirection();
+
+app.UseCors();
+
 app.UseAuthentication();
+
+//O cara tem permissão para estar aqui?
 app.UseAuthorization();
+
+//Finalmente, manda para o Controller certo.
+app.MapControllers();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -84,13 +97,5 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
-app.UseCors();
-//O cara tentou entrar por HTTP? Joga ele para o HTTPS (seguro).
-app.UseHttpsRedirection();
-//O cara tem permissão para estar aqui?
-app.UseAuthorization();
-//Finalmente, manda para o Controller certo.
-app.MapControllers();
 
 app.Run();

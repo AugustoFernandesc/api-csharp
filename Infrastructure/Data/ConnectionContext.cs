@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MinhaApi.Domain.Models;
+using MinhaApi.Infrastructure.Mappings;
 
 namespace MinhaApi.Infrastructure.Data;
 
@@ -10,4 +11,9 @@ public class ConnectionContext : DbContext
     }
 
     public DbSet<Employee> Employees { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(EmployeeConfiguration).Assembly);
+    }
 }

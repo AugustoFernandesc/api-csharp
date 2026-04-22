@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MinhaApi.Application.ViewModel;
@@ -18,9 +19,14 @@ public class EmployeeController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult Add([FromForm] EmployeeViewModel employeeView)
+    public async Task<IActionResult> Add([FromForm] EmployeeViewModel employeeView, [FromServices] IValidator<EmployeeViewModel> validator)
     {
-        _employeeService.Add(employeeView);
+        var validationResult = await validator.ValidateAsync(employeeView);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+        await _employeeService.Add(employeeView);
         return Ok();
     }
 

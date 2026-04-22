@@ -8,9 +8,13 @@ public class EmployeeViewModel
     //Garante que o .NET barra a requisição se o nome vier vazio.
     public required string Name { get; set; }
 
+    public required string Email { get; set; }
+
+    public required string Password { get; set; }
+
     //O .NET já tenta converter o que vier do formulário para um número inteiro.
     public int Age { get; set; }
 
     //Esta é a chave! Ela diz ao .NET: "Prepare-se para receber um fluxo de bytes (o arquivo) e não apenas um texto". É isso que faz o Swagger mostrar aquele botão de "Fazer upload de arquivo".
-    public required IFormFile Photo { get; set; }
+    public IFormFile? Photo { get; set; }
 }
