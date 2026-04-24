@@ -1,20 +1,21 @@
 namespace MinhaApi.Application.ViewModel;
 
-//viewModel e o DTO
-// ela e uma classe que define exatamente o que a API espera receber do mundo externo(swagger, front)
-//em comparacao com o nest, usaria o class validator(@IsNoEmpity), no c# e required
+// O VIEWMODEL É O "FORMULÁRIO DE ENTRADA" DA API:
+// Ele define exatamente o que o mundo externo (front, Swagger, Postman)
+// pode mandar para dentro da aplicação.
 public class EmployeeViewModel
 {
-    //Garante que o .NET barra a requisição se o nome vier vazio.
+    // required ajuda a exigir que o campo exista na entrada.
     public required string Name { get; set; }
 
     public required string Email { get; set; }
 
     public required string Password { get; set; }
 
-    //O .NET já tenta converter o que vier do formulário para um número inteiro.
+    // O .NET já tenta converter o que vier do formulário para inteiro.
     public int Age { get; set; }
 
-    //Esta é a chave! Ela diz ao .NET: "Prepare-se para receber um fluxo de bytes (o arquivo) e não apenas um texto". É isso que faz o Swagger mostrar aquele botão de "Fazer upload de arquivo".
+    // IFormFile representa um arquivo enviado em multipart/form-data.
+    // É isso que permite upload de imagem pelo Swagger ou front.
     public IFormFile? Photo { get; set; }
 }

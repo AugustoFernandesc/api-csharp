@@ -10,6 +10,8 @@ using Microsoft.IdentityModel.Tokens;
 using MinhaApi.Infrastructure.Services;
 using FluentValidation;
 
+// O Program.cs É O "QUARTEL-GENERAL" DA API:
+// Aqui registramos serviços, autenticação, banco e o pipeline HTTP.
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -31,12 +33,16 @@ builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+// Adicione esta linha aqui:
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddScoped<AuthService>();
 
+// Procura validators no assembly e registra automaticamente no container.
 builder.Services.AddValidatorsFromAssemblyContaining<EmployeeValidator>();
 
 //permite que o front converse com essa api, sem isso o navegador bloqueia
@@ -50,9 +56,12 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Lê a chave JWT da configuração para validar tokens recebidos pela API.
+var jwtSecretKey = builder.Configuration["JwtSettings:SecretKey"]
+    ?? throw new InvalidOperationException("JwtSettings:SecretKey não foi configurado.");
+var key = Encoding.ASCII.GetBytes(jwtSecretKey);
 
-var key = Encoding.ASCII.GetBytes(builder.Configuration["JwtSettings:SecretKey"]);
-
+// Configura autenticação Bearer com JWT.
 builder.Services.AddAuthentication(x =>
 {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -70,7 +79,6 @@ builder.Services.AddAuthentication(x =>
         ValidateAudience = false
     };
 });
-
 
 //tudo que esta acima deste var app e o que seria no module do nestjs
 var app = builder.Build();
