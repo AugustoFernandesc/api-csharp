@@ -9,12 +9,18 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MinhaApi.Infrastructure.Services;
 using FluentValidation;
+using FluentValidation.AspNetCore;
 
 // O Program.cs É O "QUARTEL-GENERAL" DA API:
 // Aqui registramos serviços, autenticação, banco e o pipeline HTTP.
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+
+builder.Services.AddFluentValidationAutoValidation(); // Ativa a validação automática
+// Procura validators no assembly e registra automaticamente no container.
+builder.Services.AddValidatorsFromAssemblyContaining<EmployeeValidator>(); // Registra seus validadores
 
 //conexao com o banco de dados
 //e basicamente o que eu faco no TypeOrmModule.forRoot() no nest
@@ -28,7 +34,6 @@ builder.Services.AddSwaggerGen();
 //isso e a injecao de dependencia (coracao do backend)
 //aqui  faz basicamente o seguinte: quando alguem pedir uma interface IEmployeeRepository, entrega a classe EmployeeRepository
 //no nest seria os providers, ele faz com que nao precisa colocar NEW para instanciar a classe
-
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -42,8 +47,6 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddScoped<AuthService>();
 
-// Procura validators no assembly e registra automaticamente no container.
-builder.Services.AddValidatorsFromAssemblyContaining<EmployeeValidator>();
 
 //permite que o front converse com essa api, sem isso o navegador bloqueia
 builder.Services.AddCors(options =>
@@ -83,7 +86,6 @@ builder.Services.AddAuthentication(x =>
 //tudo que esta acima deste var app e o que seria no module do nestjs
 var app = builder.Build();
 //tudo que esta abaixo deste var app define como a requisicao viaja dentro da API
-
 //O cara tentou entrar por HTTP? Joga ele para o HTTPS (seguro).
 app.UseHttpsRedirection();
 

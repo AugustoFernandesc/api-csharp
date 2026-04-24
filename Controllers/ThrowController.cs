@@ -1,6 +1,6 @@
-
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using MinhaApi.Domain.Exceptions;
 
 namespace MinhaApi.Controllers;
 
@@ -27,12 +27,20 @@ public class ThrowController : ControllerBase
         }
 
         var exceptionHandlerFeature = HttpContext.Features.Get<IExceptionHandlerFeature>()!;
+        var exception = exceptionHandlerFeature.Error;
 
-        if (exceptionHandlerFeature == null) return Problem();
+        // SE O ERRO FOR DO TIPO 'EntityNotFoundException', RETORNA 404
+        if (exception is EntityNotFoundException)
+        {
+            return Problem(
+                detail: exception.Message,
+                statusCode: StatusCodes.Status404NotFound,
+                title: "Recurso não encontrado");
+        }
 
-        // Devolve mensagem e stack trace para facilitar descobrir o problema.
+        // Se for qualquer outro erro, mantém o padrão
         return Problem(
-            detail: exceptionHandlerFeature.Error.StackTrace,
-            title: exceptionHandlerFeature.Error.Message);
+        detail: exception.StackTrace,
+        title: exception.Message);
     }
 }

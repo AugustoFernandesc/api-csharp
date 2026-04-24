@@ -4,6 +4,7 @@ using MinhaApi.Domain.Models;
 using MinhaApi.Domain.Interfaces;
 using MinhaApi.Service;
 using MinhaApi.Application.ViewModel;
+using MinhaApi.Domain.Exceptions;
 
 // O EMPLOYEE SERVICE É O "GERENTE DE FUNCIONÁRIOS":
 // O Controller entrega a solicitação, e esse service decide como executar a regra de negócio.
@@ -61,7 +62,7 @@ public class EmployeeService : IEmployeeService
         // Se não existe funcionário ou não existe caminho da foto, devolve null.
         if (employee == null || string.IsNullOrEmpty(employee.photo))
         {
-            return null;
+            throw new EntityNotFoundException("Funcionario ou foto nao encontrado");
         }
 
         // Lê o arquivo salvo em disco e entrega seu conteúdo em bytes.
@@ -91,7 +92,7 @@ public class EmployeeService : IEmployeeService
         var employee = await _uow.Repository<Employee>().GetById(id);
         if (employee == null)
         {
-            throw new Exception("Funcionario nao encontrado");
+            throw new EntityNotFoundException("Funcionario nao encontrado para atualizacaoo.");
         }
 
         // Se vier nova senha, ela é reprocessada em hash.
@@ -115,7 +116,7 @@ public class EmployeeService : IEmployeeService
 
         if (employee == null)
         {
-            throw new Exception("Funcionario nao encontrado");
+            throw new EntityNotFoundException("Funcionario nao encontrado");
         }
 
         await _uow.Repository<Employee>().Delete(id);

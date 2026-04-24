@@ -22,15 +22,8 @@ public class EmployeeController : ControllerBase
     // POST /api/employee
     // Recebe os dados do formulário, valida e manda cadastrar.
     [HttpPost]
-    public async Task<IActionResult> Add([FromForm] EmployeeViewModel employeeView, [FromServices] IValidator<EmployeeViewModel> validator)
+    public async Task<IActionResult> Add([FromForm] EmployeeViewModel employeeView)
     {
-        // Roda o FluentValidation manualmente para devolver erro amigável.
-        var validationResult = await validator.ValidateAsync(employeeView);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
-
         await _employeeService.Add(employeeView);
         return Ok();
     }
@@ -43,12 +36,6 @@ public class EmployeeController : ControllerBase
     public async Task<IActionResult> DownLoadPhoto(Guid id)
     {
         var dataBytes = await _employeeService.GetEmployeePhoto(id);
-
-        if (dataBytes == null)
-        {
-            return NotFound("Funcionário ou foto não encontrados");
-        }
-
         return File(dataBytes, "image/jpeg");
     }
 
